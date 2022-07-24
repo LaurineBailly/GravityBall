@@ -49,15 +49,11 @@ public class BallView extends View {
         int ballHight = ballPicture.getHeight();
         int ballWidth = ballPicture.getWidth();
 
-        // Position of the ball to be calculated
-        int newPosY;
-        int newPosX;
-
         // Position calculation in pixels after acceleration
         // s = u*t + (1/2)a t^2
         //where s is position, u is velocity at t=0, t is time and a is a constant acceleration.
-        newPosX = (int) (2 * posLeftDpx - previousPosLeftDpx + 0.5 * accelerationAx * timerPeriodSeconds * timerPeriodSeconds);
-        newPosY = (int) (2 * posTopDpx - previousPosTopDpx + 0.5 * accelerationAy * timerPeriodSeconds * timerPeriodSeconds);
+        int newPosX = (int) (2*posLeftDpx - previousPosLeftDpx + 0.5*accelerationAx*timerPeriodSeconds*timerPeriodSeconds);
+        int newPosY = (int) (2*posTopDpx - previousPosTopDpx + 0.5 *accelerationAy*timerPeriodSeconds*timerPeriodSeconds);
 
         // Aging the values of posLeftDpx and posTopDpx
         previousPosTopDpx = posTopDpx;
