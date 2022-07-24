@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import androidx.annotation.Nullable;
 
@@ -23,8 +24,9 @@ public class BallView extends View {
     private int posTopDpx;
     private int posLeftDpx;
 
-    // Number of time the ball is at the bottom of the view
-    private int hitsOnBottom = 0;
+    // Old picture postion from left and top of the view component
+    private int previousPosTopDpx;
+    private int previousPosLeftDpx;
 
     // Component view constructor with the physical layout
     public BallView(Context context, @Nullable AttributeSet attrs) {
@@ -36,8 +38,10 @@ public class BallView extends View {
         super(context);
     }
 
-    public void setPosition(int posTopDpx, int posLeftDpx) {
+    // Set new position values of the ball
+    public void setPosition(double accelerationAx, double accelerationAy, double timerPeriodSeconds, double onePixelInMm) {
 
+        // Variables stocking view and ballview graphic properties
         int viewTop = getTop();
         int viewBottom = getBottom();
         int viewLeft = getLeft();
@@ -45,47 +49,57 @@ public class BallView extends View {
         int ballHight = ballPicture.getHeight();
         int ballWidth = ballPicture.getWidth();
 
+        // Position of the ball to be calculated
+        int newPosY;
+        int newPosX;
 
-        // Determining the X position value
+        // Position calculation in pixels after acceleration
+        // s = u*t + (1/2)a t^2
+        //where s is position, u is velocity at t=0, t is time and a is a constant acceleration.
+        newPosX = (int) (2 * posLeftDpx - previousPosLeftDpx + 0.5 * accelerationAx * timerPeriodSeconds * timerPeriodSeconds);
+        newPosY = (int) (2 * posTopDpx - previousPosTopDpx + 0.5 * accelerationAy * timerPeriodSeconds * timerPeriodSeconds);
 
-        // If the finger reachs the Top of the screen, the ball does not get out of the screen
-        if(posTopDpx < viewTop + ballHight/2) {
-            this.posTopDpx = viewTop;
-            hitsOnBottom = 0;
-        }
-
-        // If the finger reachs the bottom of the screen, the ball does not get out of the screen
-        else if(posTopDpx > viewBottom - ballHight/2) {
-            this.posTopDpx = viewBottom - ballHight;
-            hitsOnBottom++;
-        }
-        else {
-            this.posTopDpx = posTopDpx - ballHight/2;
-            hitsOnBottom = 0;
-        }
+        // Aging the values of posLeftDpx and posTopDpx
+        previousPosTopDpx = posTopDpx;
+        previousPosLeftDpx = posLeftDpx;
 
         // Determining the Y position value
 
-        // If the finger reachs the left of the screen, the ball does not get out of the screen
-        if(posLeftDpx < viewLeft + ballWidth/2) {
+        // If the ball reachs the Top of the screen, the ball does not get out of the screen
+        if(newPosY < viewTop) {
+            this.posTopDpx = viewTop;
+        }
+
+        // If the ball reachs the bottom of the screen, the ball does not get out of the screen
+        else if(newPosY > (viewBottom - ballHight)) {
+            this.posTopDpx = viewBottom - ballHight;
+        }
+        else {
+            this.posTopDpx = newPosY;
+        }
+
+        // Determining the X position value
+
+        // If the ball reachs the left of the screen, the ball does not get out of the screen
+        if(newPosX < viewLeft) {
             this.posLeftDpx = viewLeft;
         }
 
-        // If the finger reachs the right of the screen, the ball does not get out of the screen
-        else if(posLeftDpx > viewRight - ballWidth/2) {
+        // If the ball reachs the right of the screen, the ball does not get out of the screen
+        else if(newPosX > (viewRight - ballWidth)) {
             this.posLeftDpx = viewRight - ballWidth;
         }
         else {
-            this.posLeftDpx = posLeftDpx - ballWidth/2;
+            this.posLeftDpx = newPosX;
         }
     }
 
     public int getPosTopDpx() {
-        return posTopDpx + ballPicture.getHeight()/2;
+        return posTopDpx;
     }
 
     public int getPosLeftDpx() {
-        return posLeftDpx + ballPicture.getWidth()/2;
+        return posLeftDpx;
     }
 
     // onSizeChanged is called each time the size view changes, here only once because the activity
@@ -99,7 +113,9 @@ public class BallView extends View {
 
         // Getting left and top position for a picture at the center of the view component
         posLeftDpx = (w - ballPicture.getWidth())/2;
+        previousPosLeftDpx = posLeftDpx;
         posTopDpx = (h - ballPicture.getHeight())/2;
+        previousPosTopDpx = posTopDpx;
     }
 
     // onDraw is called by the system each time the view component is displayed or updated
@@ -116,15 +132,8 @@ public class BallView extends View {
     public boolean performClick(){
         super.performClick();
 
-        // If the user does not try to browse the ball from outside the view
-        if(hitsOnBottom <= 1) {
-
-            // The old view redraws with the new view (onDraw method is called)
-            invalidate();
-            return true;
-        }
-        else {
-            return false;
-        }
+        // The old view redraws with the new view (onDraw method is called)
+        invalidate();
+        return true;
     }
 }
