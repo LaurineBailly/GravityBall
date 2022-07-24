@@ -21,9 +21,6 @@ public class Phone implements SensorEventListener {
     private SensorManager sensorManager;
     private Sensor accelerometer;
 
-    // Conversion 1mm to 1m
-    private final double METERS_ONE_MM = 0.001;
-
     // Getting the size of one pixel in mm
     private double mmOnePixel;
 
@@ -31,19 +28,19 @@ public class Phone implements SensorEventListener {
     public Phone(Context context, double mmOnePixel) {
         sensorManager = (SensorManager)context.getSystemService(context.SENSOR_SERVICE);
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        sensorManager.registerListener(this,accelerometer,sensorManager.SENSOR_DELAY_NORMAL);
+        sensorManager.registerListener(this, accelerometer, sensorManager.SENSOR_DELAY_NORMAL);
         this.mmOnePixel = mmOnePixel;
     }
 
     // Acceleration ax in pixels per second
     public int getAx() {
-        int axPixels = (int)(-ax/METERS_ONE_MM/mmOnePixel);
+        int axPixels = (int)(-ax/0.001/mmOnePixel);
         return axPixels;
     }
 
     // Acceleration ay in pixels per second
     public int getAy() {
-        int ayPixels = (int)(ay/METERS_ONE_MM/mmOnePixel);
+        int ayPixels = (int)(ay/0.001/mmOnePixel);
         return ayPixels;
     }
 

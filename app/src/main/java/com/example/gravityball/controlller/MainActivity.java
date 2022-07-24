@@ -16,14 +16,11 @@ import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity {
 
-    // A timer thanks to which the ball position will be updated
-    Timer timer;
-
     // Timer period
-    private final int TIMER_PERIOD = 20;
+    public static final int PERIOD_REFRESH_BALLVIEW = 20;
 
-    // Conversion 1ms to s
-    private final double ONE_MS_IN_S = 0.001;
+    // True if the ball bitmap is loaded
+    private boolean ballPictureLoaded;
 
     // ballView is the view including the ball and the area it can move in
     private BallView ballView;
@@ -32,14 +29,11 @@ public class MainActivity extends AppCompatActivity {
     private TextView tvXValue;
     private TextView tvYValue;
 
-    // Conversion 1 inch to mm
-    private final double ONE_INCH_IN_MM = 25.4;
-
-    // True if the ball bitmap is loaded
-    private boolean ballPictureLoaded;
-
     // Phone to manage the accelerometer
     Phone phone;
+
+    // A timer thanks to which the ball position will be updated
+    Timer timerRefreshBallView;
 
     // onCreate is called when the activity is created
     @Override
@@ -76,11 +70,11 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // Creating the phone
-        phone = new Phone(this,mmOnePixel);
+        phone = new Phone(this, mmOnePixel);
 
-        // Timer that will tick every TIMER_PERIOD ms
-        timer = new Timer();
-        timer.scheduleAtFixedRate(new TimerTask() {
+        // Timer that will tick every PERIOD_REFRESH_BALLVIEW ms
+        timerRefreshBallView = new Timer();
+        timerRefreshBallView.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
                 if(ballPictureLoaded) {
@@ -91,33 +85,26 @@ public class MainActivity extends AppCompatActivity {
 
                     // Setting the new position of the ball according to the accelaration noticed
                     // during the timer tick. We will consider it has been the same one during
-                    // TIMER_PERIOD ms.
-                    ballView.setPosition(accelerationAx,accelerationAy,TIMER_PERIOD*ONE_MS_IN_S,mmOnePixel);
+                    // PERIOD_REFRESH_BALLVIEW ms.
+                    ballView.setPosition(accelerationAx, accelerationAy, PERIOD_REFRESH_BALLVIEW*0.001, mmOnePixel);
                     ballView.performClick();
 
                     // Setting the coordinates values to the textviews in mm
                     double xCoordinate = (ballView.getPosLeftDpx()*mmOnePixel);
                     double yCoordinate = (ballView.getPosTopDpx()*mmOnePixel);
-                    tvXValue.setText(String.format("%.1f",xCoordinate));
-                    tvYValue.setText(String.format("%.1f",yCoordinate));
+                    tvXValue.setText(String.format("%.1f", xCoordinate));
+                    tvYValue.setText(String.format("%.1f", yCoordinate));
                 }
             }
-        },TIMER_PERIOD,TIMER_PERIOD);
+        }, PERIOD_REFRESH_BALLVIEW, PERIOD_REFRESH_BALLVIEW);
 
     }
 
-    // onResume is called when the activity is ready
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-    }
-
-    // onDestroy is called when the activity is destroyed (phone is sleeping or app killed)
+    // onDestroy is called when the activity is destroyed (app killed)
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        timer.cancel();
+        timerRefreshBallView.cancel();
         phone.cancelListenerAccelerometer();
     }
 
@@ -134,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
         double dip = displayMetrics.DENSITY_DEFAULT*displayMetrics.density;
 
         // size of one pixel
-        double mmForOnePixel = ONE_INCH_IN_MM/dip;
+        double mmForOnePixel = 25.4/dip;
         return mmForOnePixel;
     }
 }

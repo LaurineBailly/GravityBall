@@ -46,14 +46,14 @@ public class BallView extends View {
         int viewBottom = getBottom();
         int viewLeft = getLeft();
         int viewRight = getRight();
-        int ballHight = ballPicture.getHeight();
+        int ballHeight = ballPicture.getHeight();
         int ballWidth = ballPicture.getWidth();
 
         // Position calculation in pixels after acceleration
         // s = u*t + (1/2)a t^2
         //where s is position, u is velocity at t=0, t is time and a is a constant acceleration.
-        int newPosX = (int) (2*posLeftDpx - previousPosLeftDpx + 0.5*accelerationAx*timerPeriodSeconds*timerPeriodSeconds);
-        int newPosY = (int) (2*posTopDpx - previousPosTopDpx + 0.5 *accelerationAy*timerPeriodSeconds*timerPeriodSeconds);
+        int newPosX = (int)(2*posLeftDpx - previousPosLeftDpx + 0.5*accelerationAx*timerPeriodSeconds*timerPeriodSeconds);
+        int newPosY = (int)(2*posTopDpx - previousPosTopDpx + 0.5 *accelerationAy*timerPeriodSeconds*timerPeriodSeconds);
 
         // Aging the values of posLeftDpx and posTopDpx
         previousPosTopDpx = posTopDpx;
@@ -67,8 +67,8 @@ public class BallView extends View {
         }
 
         // If the ball reachs the bottom of the screen, the ball does not get out of the screen
-        else if(newPosY > (viewBottom - ballHight)) {
-            this.posTopDpx = viewBottom - ballHight;
+        else if(newPosY > (viewBottom - ballHeight)) {
+            this.posTopDpx = viewBottom - ballHeight;
         }
         else {
             this.posTopDpx = newPosY;
