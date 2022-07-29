@@ -74,14 +74,14 @@ public class BallView extends View {
         // Vy(t) = Ay*t + Vy0
         // where t is time, Ay is the accelerations on Y axis (pixels/s2) and Vy0 is the initial
         // speed of the ball
-        double yPureSpeedPixSecond = deltaAccTopDpx*periodUpdatePosSec + xSpeedPixSec;
+        double yPureSpeedPixSecond = deltaAccTopDpx*periodUpdatePosSec + ySpeedPixSec;
 
         // Vx(t) = Ax*t + Vx0
         // where t is time, Ax is the accelerations on X axis (pixels/s2) and Vx0 is the initial
         // speed of the ball
         double xPureSpeedPixSecond = deltaAccLeftDpx*periodUpdatePosSec + xSpeedPixSec;
 
-        // Position the ball should have with this acceleration, screen boundaries free
+        // Position the ball should have with this acceleration, screen boundaries free, in pixels
 
         // Sy = Sy(t-1) + deltaAccTopDpx + Uy(t-1)*t
         // where Sy is position, Uy is initial velocity, t is time.
@@ -141,7 +141,7 @@ public class BallView extends View {
     }
 
     public void setPeriodUpdatePosSec(int periodUpdatePosMs) {
-        periodUpdatePosSec = periodUpdatePosMs * 0.001;
+        periodUpdatePosSec = periodUpdatePosMs*0.001;
     }
 
     // onSizeChanged is called each time the size view changes, here only once because the activity

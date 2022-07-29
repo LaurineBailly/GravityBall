@@ -22,7 +22,10 @@ import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity {
 
-    // Timer period
+    // A timer thanks to which the ball position will be updated
+    Timer timerRefreshBallView;
+
+    // Period after which the ball position is updated
     public static final int PERIOD_REFRESH_BALL_POS_MS = 40;
 
     // True if the ball bitmap is loaded
@@ -41,9 +44,6 @@ public class MainActivity extends AppCompatActivity {
     // Textviews that display the coordinates in mm
     private TextView tvXValue;
     private TextView tvYValue;
-
-    // A timer thanks to which the ball position will be updated
-    Timer timerRefreshBallView;
 
     // onCreate is called when the activity is created
     @Override
@@ -117,8 +117,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        Log.w("tag","onStart");
-
         // Start checking the values of the accelerometer
         pixelsAccelerometer.startListener();
 
@@ -147,7 +145,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        Log.w("tag","onStop");
         if (pixelsAccelerometer != null) {
             pixelsAccelerometer.cancelListener();
         }
@@ -158,11 +155,7 @@ public class MainActivity extends AppCompatActivity {
 
     // Setting the coordinates values of the ball to the textviews in mm
     public void displayBallCoordinates() {
-        double xCoordinate = ballView.getPosLeftDpx();
-        double yCoordinate = ballView.getPosTopDpx();
-        xCoordinate = PixelSizer.convertPixelsToMillimeters(xCoordinate);
-        yCoordinate = PixelSizer.convertPixelsToMillimeters(yCoordinate);
-        tvXValue.setText(String.format("%.1f",xCoordinate));
-        tvYValue.setText(String.format("%.1f",yCoordinate));
+        tvXValue.setText(String.format("%.1f", PixelSizer.convertPixelsToMillimeters(ballView.getPosLeftDpx())));
+        tvYValue.setText(String.format("%.1f", PixelSizer.convertPixelsToMillimeters(ballView.getPosTopDpx())));
     }
 }

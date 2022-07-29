@@ -39,6 +39,5 @@ public abstract class PixelSizer {
     // Meters to pixels converter
     public static double convertMetersToPixels(double meters) {
         return meters*1000*pixelsInOneMm;
-
     }
 }

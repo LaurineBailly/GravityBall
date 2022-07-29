@@ -13,7 +13,7 @@ public class PixelsAccelerometer implements SensorEventListener {
     private float ayMetersSec2;
 
     // sensorsOnDevice represents the sensors on the device.
-    // accelerometer is a class representing the accelerometer on the device.
+    // accelerometer represents the accelerometer on the device.
     private SensorManager sensorsOnDevice;
     private Sensor accelerometer;
 
