@@ -1,7 +1,5 @@
 <resources>
-    <string name="app_name">MovingBall</string>
-    <string name="minMovParamTitle">Ball wanna roll</string>
-    <string name="minMovParamDescription">Please select the minimum movement the ball is allowed to browse.</string>
+    <string name="app_name">GrativyBall</string>
     <string name="tv_title_x">X (mm)</string>
     <string name="tv_title_y">Y (mm)</string>
 </resources>

@@ -1,14 +1,20 @@
 package com.example.gravityball.controlller;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.DialogInterface;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.example.gravityball.R;
-import com.example.gravityball.modele.Phone;
+import com.example.gravityball.modele.PixelSizer;
+import com.example.gravityball.modele.PixelsAccelerometer;
 import com.example.gravityball.view.BallView;
 
 import java.util.Timer;
@@ -17,7 +23,7 @@ import java.util.TimerTask;
 public class MainActivity extends AppCompatActivity {
 
     // Timer period
-    public static final int PERIOD_REFRESH_BALLVIEW = 20;
+    public static final int PERIOD_REFRESH_BALL_POS_MS = 40;
 
     // True if the ball bitmap is loaded
     private boolean ballPictureLoaded;
@@ -25,12 +31,16 @@ public class MainActivity extends AppCompatActivity {
     // ballView is the view including the ball and the area it can move in
     private BallView ballView;
 
+    // An accelometer that provides data in pixels/s2
+    PixelsAccelerometer pixelsAccelerometer;
+
+    // How many times the pixel accelerometer values should be checked per
+    // PERIOD_REFRESH_BALL_POS_MS ms
+    public static final int FREQ_CHECK_PIX_ACCELEROMETER = 1;
+
     // Textviews that display the coordinates in mm
     private TextView tvXValue;
     private TextView tvYValue;
-
-    // Phone to manage the accelerometer
-    Phone phone;
 
     // A timer thanks to which the ball position will be updated
     Timer timerRefreshBallView;
@@ -49,8 +59,14 @@ public class MainActivity extends AppCompatActivity {
         tvXValue = findViewById(R.id.id_tvXValue);
         tvYValue = findViewById(R.id.id_tvYValue);
 
-        // Getting the size of one pixel in mm
-        final double mmOnePixel = getSizeOnePixel();
+        // Indicating to the ballView the period with which it is updated
+        ballView.setPeriodUpdatePosSec(PERIOD_REFRESH_BALL_POS_MS);
+
+        // DisplayMatrics structure describing general information about a display, such as its size,
+        // density, and font scaling. It is provided to PixelSize to allow conversions between metric
+        // and pixels
+        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+        PixelSizer.configure(displayMetrics);
 
         // Listening when the onSizeChanged method is called on ballView, it allows to be sure that
         // the bipmap file is loaded.
@@ -61,67 +77,92 @@ public class MainActivity extends AppCompatActivity {
                 // The ball picture is loaded
                 ballPictureLoaded = true;
 
-                // Setting the coordinates values to the textviews in mm
-                double xCoordinate = (ballView.getPosLeftDpx()*mmOnePixel);
-                double yCoordinate = (ballView.getPosTopDpx()*mmOnePixel);
-                tvXValue.setText(String.format("%.1f",xCoordinate));
-                tvYValue.setText(String.format("%.1f",yCoordinate));
+                // Display the coordinates of the ballView
+                displayBallCoordinates();
             }
         });
 
-        // Creating the phone
-        phone = new Phone(this, mmOnePixel);
+        // Creating the pixelsAccelerometer which manages the acceleration measurements and gives it
+        // in pixels/s2. sensorsOnDevice is the list of sensors on the device.
+        SensorManager sensorsOnDvice = (SensorManager)getSystemService(SENSOR_SERVICE);
+        pixelsAccelerometer = new PixelsAccelerometer(sensorsOnDvice);
+        try {
 
-        // Timer that will tick every PERIOD_REFRESH_BALLVIEW ms
+            // Giving the check accelerometer values to the pixelAccelerometer : once between the
+            // ballView updates.
+            pixelsAccelerometer.initialize(PERIOD_REFRESH_BALL_POS_MS/FREQ_CHECK_PIX_ACCELEROMETER);
+        }
+
+        // In case of a failure of the pixelsAccelerometer initialization.
+        catch (Exception e) {
+
+            // A window pops up displaying the error and invites the user to close the application.
+            // When the user presses close, onDestroy() is triggered.
+            final EditText description = new EditText(this);
+            AlertDialog.Builder errorPopUp = new AlertDialog.Builder(this);
+            errorPopUp.setTitle("Error encountered");
+            errorPopUp.setMessage("The following error has been encountered: " + e.toString());
+            errorPopUp.setPositiveButton("Close", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    finish();
+                }
+            });
+            errorPopUp.show();
+        }
+    }
+
+    // The activity is starting
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        Log.w("tag","onStart");
+
+        // Start checking the values of the accelerometer
+        pixelsAccelerometer.startListener();
+
+        // Instanciating the timer
         timerRefreshBallView = new Timer();
+
+        // timerRefreshBallView will tick every PERIOD_REFRESH_BALL_POS_MS ms and starts immediately.
         timerRefreshBallView.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
                 if(ballPictureLoaded) {
 
-                    // Getting acceleration in pixels
-                    double accelerationAx = phone.getAx();
-                    double accelerationAy = phone.getAy();
-
                     // Setting the new position of the ball according to the accelaration noticed
-                    // during the timer tick. We will consider it has been the same one during
-                    // PERIOD_REFRESH_BALLVIEW ms.
-                    ballView.setPosition(accelerationAx, accelerationAy, PERIOD_REFRESH_BALLVIEW*0.001, mmOnePixel);
+                    // during the timer tick.
+                    ballView.setPosition(pixelsAccelerometer);
                     ballView.performClick();
 
                     // Setting the coordinates values to the textviews in mm
-                    double xCoordinate = (ballView.getPosLeftDpx()*mmOnePixel);
-                    double yCoordinate = (ballView.getPosTopDpx()*mmOnePixel);
-                    tvXValue.setText(String.format("%.1f", xCoordinate));
-                    tvYValue.setText(String.format("%.1f", yCoordinate));
+                    displayBallCoordinates();
                 }
             }
-        }, PERIOD_REFRESH_BALLVIEW, PERIOD_REFRESH_BALLVIEW);
-
+        }, 0, PERIOD_REFRESH_BALL_POS_MS);
     }
 
-    // onDestroy is called when the activity is destroyed (app killed)
+    // When the activity is no longer visible
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        timerRefreshBallView.cancel();
-        phone.cancelListenerAccelerometer();
+    protected void onStop() {
+        super.onStop();
+        Log.w("tag","onStop");
+        if (pixelsAccelerometer != null) {
+            pixelsAccelerometer.cancelListener();
+        }
+        if (timerRefreshBallView != null) {
+            timerRefreshBallView.cancel();
+        }
     }
 
-    // The size of one pixel depends on the screen density
-    // getResources().getDisplayMetrics().density is the scaling factor for the Density Independent
-    // Pixel unit, where one DIP is one pixel on an approximately 160 dpi screen
-    double getSizeOnePixel() {
-
-        // A structure describing general information about a display, such as its size, density,
-        // and font scaling.
-        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
-
-        // density of the screen (pixels per inch). DENSITY_DEFAULT = 160.
-        double dip = displayMetrics.DENSITY_DEFAULT*displayMetrics.density;
-
-        // size of one pixel
-        double mmForOnePixel = 25.4/dip;
-        return mmForOnePixel;
+    // Setting the coordinates values of the ball to the textviews in mm
+    public void displayBallCoordinates() {
+        double xCoordinate = ballView.getPosLeftDpx();
+        double yCoordinate = ballView.getPosTopDpx();
+        xCoordinate = PixelSizer.convertPixelsToMillimeters(xCoordinate);
+        yCoordinate = PixelSizer.convertPixelsToMillimeters(yCoordinate);
+        tvXValue.setText(String.format("%.1f",xCoordinate));
+        tvYValue.setText(String.format("%.1f",yCoordinate));
     }
 }
