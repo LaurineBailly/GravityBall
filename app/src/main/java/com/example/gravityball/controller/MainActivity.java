@@ -1,4 +1,4 @@
-package com.example.gravityball.controlller;
+package com.example.gravityball.controller;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -6,15 +6,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.DialogInterface;
 import android.hardware.SensorManager;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import com.example.gravityball.R;
-import com.example.gravityball.modele.PixelSizer;
-import com.example.gravityball.modele.PixelsAccelerometer;
+import com.example.gravityball.modele.Accelerometer;
 import com.example.gravityball.view.BallView;
 
 import java.util.Timer;
@@ -26,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
     Timer timerRefreshBallView;
 
     // Period after which the ball position is updated
-    public static final int PERIOD_REFRESH_BALL_POS_MS = 40;
+    public static final int PERIOD_REFRESH_BALL_MS = 40;
 
     // True if the ball bitmap is loaded
     private boolean ballPictureLoaded;
@@ -35,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
     private BallView ballView;
 
     // An accelometer that provides data in pixels/s2
-    PixelsAccelerometer pixelsAccelerometer;
+    Accelerometer accelerometer;
 
     // How many times the pixel accelerometer values should be checked per
     // PERIOD_REFRESH_BALL_POS_MS ms
@@ -59,14 +56,15 @@ public class MainActivity extends AppCompatActivity {
         tvXValue = findViewById(R.id.id_tvXValue);
         tvYValue = findViewById(R.id.id_tvYValue);
 
-        // Indicating to the ballView the period with which it is updated
-        ballView.setPeriodUpdatePosSec(PERIOD_REFRESH_BALL_POS_MS);
+        // Indicating to the ballView the period with which it is updated in seconds
+        try {
+            ballView.setPeriodUpdatePosSec(PERIOD_REFRESH_BALL_MS*0.001);
+        }
 
-        // DisplayMatrics structure describing general information about a display, such as its size,
-        // density, and font scaling. It is provided to PixelSize to allow conversions between metric
-        // and pixels
-        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
-        PixelSizer.configure(displayMetrics);
+        // The period given is wrong
+        catch (Exception e) {
+            e.printStackTrace();
+        }
 
         // Listening when the onSizeChanged method is called on ballView, it allows to be sure that
         // the bipmap file is loaded.
@@ -82,33 +80,42 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Creating the pixelsAccelerometer which manages the acceleration measurements and gives it
-        // in pixels/s2. sensorsOnDevice is the list of sensors on the device.
-        SensorManager sensorsOnDvice = (SensorManager)getSystemService(SENSOR_SERVICE);
-        pixelsAccelerometer = new PixelsAccelerometer(sensorsOnDvice);
+        // sensorsOnDevice is the list of sensors on the device.
+        SensorManager sensorsOnDevice = (SensorManager)getSystemService(SENSOR_SERVICE);
+
+        // Try to instantiate the accelerometer
         try {
 
-            // Giving the check accelerometer values to the pixelAccelerometer : once between the
-            // ballView updates.
-            pixelsAccelerometer.initialize(PERIOD_REFRESH_BALL_POS_MS/FREQ_CHECK_PIX_ACCELEROMETER);
+            // Giving the check accelerometer values period to the Accelerometer in us: once between
+            // the ballView updates and the list of devices.
+            accelerometer = new Accelerometer(sensorsOnDevice, PERIOD_REFRESH_BALL_MS *1000/FREQ_CHECK_PIX_ACCELEROMETER);
         }
 
-        // In case of a failure of the pixelsAccelerometer initialization.
+        // In case of a failure of the accelerometer initialization.
         catch (Exception e) {
 
-            // A window pops up displaying the error and invites the user to close the application.
-            // When the user presses close, onDestroy() is triggered.
-            final EditText description = new EditText(this);
-            AlertDialog.Builder errorPopUp = new AlertDialog.Builder(this);
-            errorPopUp.setTitle("Error encountered");
-            errorPopUp.setMessage("The following error has been encountered: " + e.toString());
-            errorPopUp.setPositiveButton("Close", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    finish();
-                }
-            });
-            errorPopUp.show();
+            // The period given to the function is wrong
+            if(e instanceof IllegalArgumentException){
+                e.printStackTrace();
+            }
+
+            // Exception due to the device
+            else {
+
+                // A window pops up displaying the error and invites the user to close the application.
+                // When the user presses close, onDestroy() is triggered.
+                final EditText description = new EditText(this);
+                AlertDialog.Builder errorPopUp = new AlertDialog.Builder(this);
+                errorPopUp.setTitle("Error encountered");
+                errorPopUp.setMessage("The following error has been encountered: " + e.toString());
+                errorPopUp.setPositiveButton("Close", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        finish();
+                    }
+                });
+                errorPopUp.show();
+            }
         }
     }
 
@@ -118,9 +125,9 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
 
         // Start checking the values of the accelerometer
-        pixelsAccelerometer.startListener();
+        accelerometer.startListener();
 
-        // Instanciating the timer
+        // Instantiating the timer
         timerRefreshBallView = new Timer();
 
         // timerRefreshBallView will tick every PERIOD_REFRESH_BALL_POS_MS ms and starts immediately.
@@ -131,22 +138,31 @@ public class MainActivity extends AppCompatActivity {
 
                     // Setting the new position of the ball according to the accelaration noticed
                     // during the timer tick.
-                    ballView.setPosition(pixelsAccelerometer);
+                    try {
+                        ballView.setPosition(accelerometer.getAx(), accelerometer.getAy());
+                    }
+
+                    // The period for updating the view has not been called
+                    catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    // Updating the view
                     ballView.performClick();
 
                     // Setting the coordinates values to the textviews in mm
                     displayBallCoordinates();
                 }
             }
-        }, 0, PERIOD_REFRESH_BALL_POS_MS);
+        }, 0, PERIOD_REFRESH_BALL_MS);
     }
 
     // When the activity is no longer visible
     @Override
     protected void onStop() {
         super.onStop();
-        if (pixelsAccelerometer != null) {
-            pixelsAccelerometer.cancelListener();
+        if (accelerometer != null) {
+            accelerometer.cancelListener();
         }
         if (timerRefreshBallView != null) {
             timerRefreshBallView.cancel();
@@ -155,7 +171,7 @@ public class MainActivity extends AppCompatActivity {
 
     // Setting the coordinates values of the ball to the textviews in mm
     public void displayBallCoordinates() {
-        tvXValue.setText(String.format("%.1f", PixelSizer.convertPixelsToMillimeters(ballView.getPosLeftDpx())));
-        tvYValue.setText(String.format("%.1f", PixelSizer.convertPixelsToMillimeters(ballView.getPosTopDpx())));
+        tvXValue.setText(String.format("%.1f", ballView.getPosLeftMm()));
+        tvYValue.setText(String.format("%.1f", ballView.getPosTopMm()));
     }
 }
