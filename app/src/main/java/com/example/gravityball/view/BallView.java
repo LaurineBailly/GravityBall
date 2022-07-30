@@ -85,33 +85,33 @@ public class BallView extends View {
 
         // (1/2)*Ax(t)*t^2
         // where t is time and Ax is the accelerations on X axis (pixels/s2)
-        double xAccelerationPosDelta = 0.5*xAcceleration*periodUpdatePosSec*periodUpdatePosSec;
+        double xMoveAx = 0.5*xAcceleration*periodUpdatePosSec*periodUpdatePosSec;
 
         // (1/2)*Ay(t)*t^2
         // where t is time and Ay is the accelerations on Y axis (pixels/s2)
-        double yAccelerationPosDelta = 0.5*yAcceleration*periodUpdatePosSec*periodUpdatePosSec;
+        double yMoveAy = 0.5*yAcceleration*periodUpdatePosSec*periodUpdatePosSec;
 
         // Velocity the ball should have with this acceleration, screen boundaries free, in pix/s
 
         // Vy(t) = Ay*t + Vy0
         // where t is time, Ay is the accelerations on Y axis (pixels/s2) and Vy0 is the initial
         // speed of the ball
-        double yPureVelocity = yAccelerationPosDelta*periodUpdatePosSec + yVelocity;
+        double yPureVelocity = yAcceleration*periodUpdatePosSec + yVelocity;
 
         // Vx(t) = Ax*t + Vx0
         // where t is time, Ax is the accelerations on X axis (pixels/s2) and Vx0 is the initial
         // speed of the ball
-        double xPureVelocity = xAccelerationPosDelta*periodUpdatePosSec + xVelocity;
+        double xPureVelocity = xAcceleration*periodUpdatePosSec + xVelocity;
 
         // Position the ball should have with this acceleration, screen boundaries free, in pixels
 
-        // Sy = Sy(t-1) + yAccelerationPosDelta + Uy(t-1)*t
+        // Sy = Sy(t-1) + yMoveAy + Uy(t-1)*t
         // where Sy is position, Uy is initial velocity, t is time.
-        double purePosTop = posTop + yAccelerationPosDelta + yVelocity *periodUpdatePosSec;
+        double purePosTop = posTop + yMoveAy + yVelocity *periodUpdatePosSec;
 
-        // Sx = Sx(t-1) + xAccelerationPosDelta + Ux(t-1)*t
+        // Sx = Sx(t-1) + xMoveAx + Ux(t-1)*t
         // where Sx is position, Ux is initial velocity, t is time.
-        double purePosLeft = posLeft + xAccelerationPosDelta + xVelocity *periodUpdatePosSec;
+        double purePosLeft = posLeft + xMoveAx + xVelocity *periodUpdatePosSec;
 
         // Determining the Y position value
 
