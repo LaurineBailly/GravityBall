@@ -76,8 +76,8 @@ public class BallView extends View {
             throw new IllegalStateException("The update period of the view has not been set.");
         }
 
-        yVelocity = 0.8*yVelocity;
-        xVelocity = 0.8*xVelocity;
+        yVelocity = yVelocity;
+        xVelocity = xVelocity;
 
         // Conversion of the acceleration data (meter/s2 --> pixels/s2)
         // The X position axis and X acceler\ation axis on the device are opposite. We put the
