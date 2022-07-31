@@ -7,6 +7,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
 import androidx.annotation.Nullable;
 
@@ -75,6 +76,9 @@ public class BallView extends View {
             throw new IllegalStateException("The update period of the view has not been set.");
         }
 
+        yVelocity = 0.8*yVelocity;
+        xVelocity = 0.8*xVelocity;
+
         // Conversion of the acceleration data (meter/s2 --> pixels/s2)
         // The X position axis and X acceler\ation axis on the device are opposite. We put the
         // acceleration axis in the same direction of the position and therefore velocity ones.
@@ -113,20 +117,21 @@ public class BallView extends View {
         // where Sx is position, Ux is initial velocity, t is time.
         double purePosLeft = posLeft + xMoveAx + xVelocity *periodUpdatePosSec;
 
+
         // Determining the Y position value
 
         // If the ball reaches the Top of the screen, the ball does not get out of the screen and
         // has no speed on this axis
-        if(purePosTop <= viewTop) {
+        if(purePosTop < viewTop) {
             posTop = viewTop;
-            yVelocity = 0;
+            yVelocity = -yVelocity;
         }
 
         // If the ball reaches the bottom of the screen, the ball does not get out of the screen and
         // has no speed on this axis
-        else if(purePosTop >= (viewBottom - ballHeight)) {
+        else if(purePosTop > (viewBottom - ballHeight)) {
             posTop = viewBottom - ballHeight;
-            yVelocity = 0;
+            yVelocity = -yVelocity;
         }
         else {
             posTop = purePosTop;
@@ -139,14 +144,14 @@ public class BallView extends View {
         // has no speed on this axis
         if(purePosLeft <= viewLeft) {
             posLeft = viewLeft;
-            xVelocity = 0;
+            xVelocity = -xVelocity;
         }
 
         // If the ball reachs the right of the screen, the ball does not get out of the screen and
         // has no speed on this axis
         else if(purePosLeft >= (viewRight - ballWidth)) {
             posLeft = viewRight - ballWidth;
-            xVelocity = 0;
+            xVelocity = -xVelocity;
         }
         else {
             posLeft = purePosLeft;

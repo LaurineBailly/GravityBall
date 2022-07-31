@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.DialogInterface;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -80,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // sensorsOnDevice is the list of sensors on the device.
+        // sensorsOnDevice is the manager of the sensors on the device.
         SensorManager sensorsOnDevice = (SensorManager)getSystemService(SENSOR_SERVICE);
 
         // Try to instantiate the accelerometer
@@ -121,10 +122,8 @@ public class MainActivity extends AppCompatActivity {
 
     // The activity is starting
     @Override
-    protected void onStart() {
-        super.onStart();
-
-        // Start checking the values of the accelerometer
+    protected void onResume() {
+        super.onResume();
         accelerometer.startListener();
 
         // Instantiating the timer
@@ -159,14 +158,10 @@ public class MainActivity extends AppCompatActivity {
 
     // When the activity is no longer visible
     @Override
-    protected void onStop() {
-        super.onStop();
-        if (accelerometer != null) {
-            accelerometer.cancelListener();
-        }
-        if (timerRefreshBallView != null) {
-            timerRefreshBallView.cancel();
-        }
+    protected void onPause() {
+        super.onPause();
+        accelerometer.cancelListener();
+        timerRefreshBallView.cancel();
     }
 
     // Setting the coordinates values of the ball to the textviews in mm

@@ -1,5 +1,7 @@
 package com.example.gravityball.modele;
 
+import static android.content.Context.SENSOR_SERVICE;
+
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
