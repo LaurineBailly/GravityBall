@@ -2,4 +2,9 @@
     <string name="app_name">GrativyBall</string>
     <string name="tv_title_x">X (mm)</string>
     <string name="tv_title_y">Y (mm)</string>
+    <string name="rb_slow">Slow</string>
+    <string name="title_speed_settings">SPEED</string>
+    <string name="description_speed_settings">Please set the speed you want the ball to browse at:</string>
+    <string name="rb_fast">Fast</string>
+    <string name="rb_medium">Medium</string>
 </resources>

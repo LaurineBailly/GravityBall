@@ -9,6 +9,7 @@ import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
+
 import androidx.annotation.Nullable;
 
 import com.example.gravityball.R;
@@ -36,6 +37,9 @@ public class BallView extends View {
     // Velocity of the ball in pixels per second
     private double xVelocity;
     private double yVelocity;
+
+    // Factor to multiply the speed of the ball by
+    private double factorSpeed;
 
     // Period after which the ball position is updated in seconds
     private double periodUpdatePosSec;
@@ -76,9 +80,6 @@ public class BallView extends View {
             throw new IllegalStateException("The update period of the view has not been set.");
         }
 
-        yVelocity = yVelocity;
-        xVelocity = xVelocity;
-
         // Conversion of the acceleration data (meter/s2 --> pixels/s2)
         // The X position axis and X acceler\ation axis on the device are opposite. We put the
         // acceleration axis in the same direction of the position and therefore velocity ones.
@@ -100,22 +101,22 @@ public class BallView extends View {
         // Vy(t) = Ay*t + Vy0
         // where t is time, Ay is the accelerations on Y axis (pixels/s2) and Vy0 is the initial
         // speed of the ball
-        double yPureVelocity = yAcceleration*periodUpdatePosSec + yVelocity;
+        double yPureVelocity = (yAcceleration*periodUpdatePosSec + yVelocity)*factorSpeed;
 
         // Vx(t) = Ax*t + Vx0
         // where t is time, Ax is the accelerations on X axis (pixels/s2) and Vx0 is the initial
         // speed of the ball
-        double xPureVelocity = xAcceleration*periodUpdatePosSec + xVelocity;
+        double xPureVelocity = (xAcceleration*periodUpdatePosSec + xVelocity)*factorSpeed;
 
         // Position the ball should have with this acceleration, screen boundaries free, in pixels
 
         // Sy = Sy(t-1) + yMoveAy + Uy(t-1)*t
         // where Sy is position, Uy is initial velocity, t is time.
-        double purePosTop = posTop + yMoveAy + yVelocity *periodUpdatePosSec;
+        double purePosTop = posTop + yMoveAy + yVelocity*periodUpdatePosSec;
 
         // Sx = Sx(t-1) + xMoveAx + Ux(t-1)*t
         // where Sx is position, Ux is initial velocity, t is time.
-        double purePosLeft = posLeft + xMoveAx + xVelocity *periodUpdatePosSec;
+        double purePosLeft = posLeft + xMoveAx + xVelocity*periodUpdatePosSec;
 
 
         // Determining the Y position value
@@ -183,6 +184,9 @@ public class BallView extends View {
         // Velocity of the ball = 0
         xVelocity = 0;
         yVelocity = 0;
+
+        // Setting the factor speed of the ball
+        setFactorSpeed(1);
     }
 
     // onDraw is called by the system each time the view component is displayed or updated
@@ -191,12 +195,12 @@ public class BallView extends View {
         super.onDraw(canvas);
 
         // Drawing the picture in the middle of the view component
-        canvas.drawBitmap(ballPicture, (int) posLeft, (int) posTop, picturePainter);
+        canvas.drawBitmap(ballPicture, (int)posLeft, (int)posTop, picturePainter);
     }
 
     // performClick method for a better accessibility
     @Override
-    public boolean performClick(){
+    public boolean performClick() {
         super.performClick();
 
         // The old view redraws with the new view (onDraw method is called)
@@ -204,26 +208,27 @@ public class BallView extends View {
         return true;
     }
 
-    public double getPosTop() {
-        return posTop;
+    public double getPosTopMm() {
+        return posTop/pixelsInOneMm;
     }
 
-    public double getPosLeft() {
-        return posLeft;
-    }
-
-    public double getPosTopMm(){
-        return posTop /pixelsInOneMm;
-    }
-
-    public double getPosLeftMm(){
-        return posLeft /pixelsInOneMm;
+    public double getPosLeftMm() {
+        return posLeft/pixelsInOneMm;
     }
 
     public void setPeriodUpdatePosSec(double periodUpdatePosSec) throws Exception {
         this.periodUpdatePosSec = periodUpdatePosSec;
-        if (periodUpdatePosSec <= 0) {
+        if(periodUpdatePosSec <= 0) {
             throw new IllegalArgumentException("The period to update the view can not be nul or negative");
+        }
+    }
+
+    public void setFactorSpeed(double factorSpeed) {
+        if(factorSpeed != 0) {
+            this.factorSpeed = factorSpeed;
+        }
+        else {
+            this.factorSpeed = 1;
         }
     }
 }

@@ -25,20 +25,19 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:background="@drawable/border_tv_title"
+                android:background="@drawable/border_title"
                 android:padding="8dp"
                 android:text="@string/tv_title_x"
-                android:textColor="@color/white" />
+                android:textColor="@color/textOnDark" />
 
             <TextView
                 android:id="@+id/id_tvXValue"
                 android:layout_width="80dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:background="@drawable/border_tv_value"
+                android:background="@drawable/border_value"
                 android:padding="8dp"
-                android:text="TextView"
-                android:textColor="@color/black" />
+                android:textColor="@color/textOnLight" />
         </LinearLayout>
 
         <LinearLayout
@@ -51,32 +50,104 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:background="@drawable/border_tv_title"
+                android:background="@drawable/border_title"
                 android:padding="8dp"
                 android:text="@string/tv_title_y"
-                android:textColor="@color/white" />
+                android:textColor="@color/textOnDark" />
 
             <TextView
                 android:id="@+id/id_tvYValue"
                 android:layout_width="80dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:background="@drawable/border_tv_value"
+                android:background="@drawable/border_value"
                 android:padding="8dp"
-                android:text="TextView"
-                android:textColor="@color/black" />
+                android:textColor="@color/textOnLight" />
         </LinearLayout>
     </LinearLayout>
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
         <view
             android:id="@+id/id_ballView"
             class="com.example.gravityball.view.BallView"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-    </RelativeLayout>
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <LinearLayout
+            android:id="@+id/id_SpeedSetting"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/border_title"
+                android:gravity="center"
+                android:padding="4dp"
+                android:text="@string/title_speed_settings"
+                android:textColor="@color/textOnDark"
+                android:textSize="24sp" />
+
+            <TextView
+                android:id="@+id/textView5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/border_description"
+                android:padding="8dp"
+                android:text="@string/description_speed_settings"
+                android:textColor="@color/textOnLight"
+                android:textSize="16sp" />
+
+            <RadioGroup
+                android:id="@+id/id_rbg_speed"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/border_value"
+                android:orientation="horizontal"
+                android:padding="16dp">
+
+                <RadioButton
+                    android:id="@+id/id_rb_slow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:buttonTint="@color/textOnLight"
+                    android:minHeight="48dp"
+                    android:text="@string/rb_slow"
+                    android:textColor="@color/textOnLight"
+                    android:textSize="16sp" />
+
+                <RadioButton
+                    android:id="@+id/id_rb_medium"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:buttonTint="@color/textOnLight"
+                    android:checked="true"
+                    android:minHeight="48dp"
+                    android:text="@string/rb_medium"
+                    android:textColor="@color/textOnLight"
+                    android:textSize="16sp" />
+
+                <RadioButton
+                    android:id="@+id/id_rb_fast"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:buttonTint="@color/textOnLight"
+                    android:minHeight="48dp"
+                    android:text="@string/rb_fast"
+                    android:textColor="@color/textOnLight"
+                    android:textSize="16sp" />
+            </RadioGroup>
+        </LinearLayout>
+    </LinearLayout>
 
 </FrameLayout>

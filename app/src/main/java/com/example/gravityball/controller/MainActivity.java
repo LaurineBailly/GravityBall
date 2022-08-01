@@ -8,7 +8,10 @@ import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.example.gravityball.R;
@@ -18,13 +21,18 @@ import com.example.gravityball.view.BallView;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     // A timer thanks to which the ball position will be updated
     Timer timerRefreshBallView;
 
     // Period after which the ball position is updated
     public static final int PERIOD_REFRESH_BALL_MS = 40;
+
+    // Defining speed types
+    public static final double SPEED_SLOW = 0.3;
+    public static final double SPEED_MEDIUM = 0.6;
+    public static final double SPEED_FAST = 0.9;
 
     // True if the ball bitmap is loaded
     private boolean ballPictureLoaded;
@@ -43,11 +51,20 @@ public class MainActivity extends AppCompatActivity {
     private TextView tvXValue;
     private TextView tvYValue;
 
+    // RadioButtons
+    private RadioButton rbFast;
+    private RadioButton rbSlow;
+    private RadioButton rbMedium;
+    private RadioGroup rbgSpeed;
+
     // onCreate is called when the activity is created
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // Forbidding phone from sleeping
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         // The ball picture is not loaded yet
         ballPictureLoaded = false;
@@ -56,6 +73,15 @@ public class MainActivity extends AppCompatActivity {
         ballView = findViewById(R.id.id_ballView);
         tvXValue = findViewById(R.id.id_tvXValue);
         tvYValue = findViewById(R.id.id_tvYValue);
+        rbFast = findViewById(R.id.id_rb_fast);
+        rbSlow = findViewById(R.id.id_rb_slow);
+        rbMedium = findViewById(R.id.id_rb_medium);
+        rbgSpeed = findViewById(R.id.id_rbg_speed);
+
+        // Method called once the click callback is sent
+        rbFast.setOnClickListener(this);
+        rbSlow.setOnClickListener(this);
+        rbMedium.setOnClickListener(this);
 
         // Indicating to the ballView the period with which it is updated in seconds
         try {
@@ -63,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // The period given is wrong
-        catch (Exception e) {
+        catch(Exception e) {
             e.printStackTrace();
         }
 
@@ -75,6 +101,33 @@ public class MainActivity extends AppCompatActivity {
 
                 // The ball picture is loaded
                 ballPictureLoaded = true;
+
+                int idRbChecked = rbgSpeed.getCheckedRadioButtonId();
+                switch(idRbChecked) {
+                    case R.id.id_rb_slow:
+                        ballView.setFactorSpeed(SPEED_SLOW);
+                        break;
+                    case R.id.id_rb_fast:
+                        ballView.setFactorSpeed(SPEED_FAST);
+                        break;
+                    default:
+                        ballView.setFactorSpeed(SPEED_MEDIUM);
+                        break;
+                }
+
+                // Setting the speed of the ball
+                if(rbSlow.isChecked()) {
+                    ballView.setFactorSpeed(SPEED_SLOW);
+                }
+                else if(rbMedium.isChecked()) {
+                    ballView.setFactorSpeed(SPEED_MEDIUM);
+                }
+                else if(rbFast.isChecked()) {
+                    ballView.setFactorSpeed(SPEED_FAST);
+                }
+                else {
+                    ballView.setFactorSpeed(SPEED_MEDIUM);
+                }
 
                 // Display the coordinates of the ballView
                 displayBallCoordinates();
@@ -89,14 +142,14 @@ public class MainActivity extends AppCompatActivity {
 
             // Giving the check accelerometer values period to the Accelerometer in us: once between
             // the ballView updates and the list of devices.
-            accelerometer = new Accelerometer(sensorsOnDevice, PERIOD_REFRESH_BALL_MS *1000/FREQ_CHECK_PIX_ACCELEROMETER);
+            accelerometer = new Accelerometer(sensorsOnDevice, PERIOD_REFRESH_BALL_MS*1000/FREQ_CHECK_PIX_ACCELEROMETER);
         }
 
         // In case of a failure of the accelerometer initialization.
-        catch (Exception e) {
+        catch(Exception e) {
 
             // The period given to the function is wrong
-            if(e instanceof IllegalArgumentException){
+            if(e instanceof IllegalArgumentException) {
                 e.printStackTrace();
             }
 
@@ -120,11 +173,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // The activity is starting
     @Override
-    protected void onResume() {
-        super.onResume();
-        accelerometer.startListener();
+    protected void onStart() {
+        super.onStart();
 
         // Instantiating the timer
         timerRefreshBallView = new Timer();
@@ -142,7 +193,7 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     // The period for updating the view has not been called
-                    catch (Exception e) {
+                    catch(Exception e) {
                         e.printStackTrace();
                     }
 
@@ -156,17 +207,47 @@ public class MainActivity extends AppCompatActivity {
         }, 0, PERIOD_REFRESH_BALL_MS);
     }
 
+    // The activity is starting
+    @Override
+    protected void onResume() {
+        super.onResume();
+        accelerometer.startListener();
+    }
+
     // When the activity is no longer visible
     @Override
     protected void onPause() {
         super.onPause();
         accelerometer.cancelListener();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
         timerRefreshBallView.cancel();
+        timerRefreshBallView.purge();
     }
 
     // Setting the coordinates values of the ball to the textviews in mm
     public void displayBallCoordinates() {
         tvXValue.setText(String.format("%.1f", ballView.getPosLeftMm()));
         tvYValue.setText(String.format("%.1f", ballView.getPosTopMm()));
+    }
+
+    @Override
+    public void onClick(View v) {
+        int idRbChecked = rbgSpeed.getCheckedRadioButtonId();
+
+        // Check which radio button was clicked
+        switch(idRbChecked) {
+            case R.id.id_rb_slow:
+                ballView.setFactorSpeed(SPEED_SLOW);
+                break;
+            case R.id.id_rb_fast:
+                ballView.setFactorSpeed(SPEED_FAST);
+                break;
+            default:
+                ballView.setFactorSpeed(SPEED_MEDIUM);
+        }
     }
 }

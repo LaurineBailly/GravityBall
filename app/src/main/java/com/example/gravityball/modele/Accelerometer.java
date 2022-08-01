@@ -36,7 +36,7 @@ public class Accelerometer implements SensorEventListener {
         // Getting the accelerometer available by default on the phone, throws an exception if it
         // does not exist
         accelerometer = this.sensorsOnDevice.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        if (accelerometer == null) {
+        if(accelerometer == null) {
             throw new UnsupportedOperationException("No accelerometer available on the device.");
         }
 
