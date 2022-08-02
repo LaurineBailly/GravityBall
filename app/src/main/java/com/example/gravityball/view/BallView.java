@@ -22,30 +22,30 @@ public class BallView extends View {
     // Bitmap that will be drawn
     private Bitmap ballPicture;
 
-    // Picture postion from left and top of the view component
-    private double posTop;
-    private double posLeft;
+    // Picture position from left and top of the view component
+    private double posTop = 0;
+    private double posLeft = 0;
 
     // Variables stocking view and ballview graphic properties
-    private int viewTop;
-    private int viewBottom;
-    private int viewLeft;
-    private int viewRight;
-    private int ballHeight;
-    private int ballWidth;
+    private int viewTop = 0;
+    private int viewBottom = 0;
+    private int viewLeft = 0;
+    private int viewRight = 0;
+    private int ballHeight = 0;
+    private int ballWidth = 0;
 
     // Velocity of the ball in pixels per second
-    private double xVelocity;
-    private double yVelocity;
+    private double xVelocity = 0;
+    private double yVelocity = 0;
 
     // Factor to multiply the speed of the ball by
-    private double factorSpeed;
+    private double factorSpeed = 1;
 
     // Period after which the ball position is updated in seconds
-    private double periodUpdatePosSec;
+    private double periodUpdatePosSec = 0;
 
     // Number of pixels in 1 mm
-    private static double pixelsInOneMm;
+    private static double pixelsInOneMm = 160/25.4;
 
     // Component view constructor with the physical layout
     // Getting the screenMetrics of the activity that instantiated a BallView object
@@ -62,14 +62,11 @@ public class BallView extends View {
         // getting the number of pixels in 1 inch
         double density = screenMetrics.DENSITY_DEFAULT*screenMetrics.density;
 
-        // Density set to 160 if density calculated == 0
-        if(density == 0) {
-            density = screenMetrics.DENSITY_DEFAULT;
+        if(density != 0) {
+            // 25.4mm = 1 inch.
+            // Getting the number of pixels in 1mm.
+            pixelsInOneMm = density/25.4;
         }
-
-        // 25.4mm = 1 inch.
-        // Getting the number of pixels in 1mm.
-        pixelsInOneMm = density/25.4;
     }
 
     // Set new position values of the ball
@@ -81,10 +78,11 @@ public class BallView extends View {
         }
 
         // Conversion of the acceleration data (meter/s2 --> pixels/s2)
-        // The X position axis and X acceler\ation axis on the device are opposite. We put the
+        // Factor speed set to the acceleration
+        // The X position axis and X acceleration axis on the device are opposite. We put the
         // acceleration axis in the same direction of the position and therefore velocity ones.
-        double xAcceleration = -aX*1000*pixelsInOneMm;
-        double yAcceleration = aY*1000*pixelsInOneMm;
+        double xAcceleration = -aX*1000*pixelsInOneMm*factorSpeed;
+        double yAcceleration = aY*1000*pixelsInOneMm*factorSpeed;
 
         // Acceleration components corresponding to the position delta due to acceleration only
 
@@ -96,67 +94,62 @@ public class BallView extends View {
         // where t is time and Ay is the accelerations on Y axis (pixels/s2)
         double yMoveAy = 0.5*yAcceleration*periodUpdatePosSec*periodUpdatePosSec;
 
-        // Velocity the ball should have with this acceleration, screen boundaries free, in pix/s
-
-        // Vy(t) = Ay*t + Vy0
-        // where t is time, Ay is the accelerations on Y axis (pixels/s2) and Vy0 is the initial
-        // speed of the ball
-        double yPureVelocity = (yAcceleration*periodUpdatePosSec + yVelocity)*factorSpeed;
-
-        // Vx(t) = Ax*t + Vx0
-        // where t is time, Ax is the accelerations on X axis (pixels/s2) and Vx0 is the initial
-        // speed of the ball
-        double xPureVelocity = (xAcceleration*periodUpdatePosSec + xVelocity)*factorSpeed;
-
-        // Position the ball should have with this acceleration, screen boundaries free, in pixels
-
-        // Sy = Sy(t-1) + yMoveAy + Uy(t-1)*t
-        // where Sy is position, Uy is initial velocity, t is time.
-        double purePosTop = posTop + yMoveAy + yVelocity*periodUpdatePosSec;
+        // Factor speed set to the velocity
+        xVelocity = xVelocity*factorSpeed;
+        yVelocity = yVelocity*factorSpeed;
 
         // Sx = Sx(t-1) + xMoveAx + Ux(t-1)*t
         // where Sx is position, Ux is initial velocity, t is time.
-        double purePosLeft = posLeft + xMoveAx + xVelocity*periodUpdatePosSec;
+        posLeft = posLeft + xMoveAx + xVelocity*periodUpdatePosSec;
 
+        // Sy = Sy(t-1) + yMoveAy + Uy(t-1)*t
+        // where Sy is position, Uy is initial velocity, t is time.
+        posTop = posTop + yMoveAy + yVelocity*periodUpdatePosSec;
 
         // Determining the Y position value
 
         // If the ball reaches the Top of the screen, the ball does not get out of the screen and
         // has no speed on this axis
-        if(purePosTop < viewTop) {
+        if(posTop < viewTop) {
             posTop = viewTop;
             yVelocity = -yVelocity;
         }
 
         // If the ball reaches the bottom of the screen, the ball does not get out of the screen and
         // has no speed on this axis
-        else if(purePosTop > (viewBottom - ballHeight)) {
+        else if(posTop > (viewBottom - ballHeight)) {
             posTop = viewBottom - ballHeight;
             yVelocity = -yVelocity;
         }
         else {
-            posTop = purePosTop;
-            yVelocity = yPureVelocity;
+
+            // Vy(t) = Ay*t + Vy0
+            // where t is time, Ay is the accelerations on Y axis (pixels/s2) and Vy0 is the initial
+            // speed of the ball
+            yVelocity = yAcceleration*periodUpdatePosSec + yVelocity;
         }
 
         // Determining the X position value
 
-        // If the ball reachs the left of the screen, the ball does not get out of the screen and
+        // If the ball reaches the left of the screen, the ball does not get out of the screen and
         // has no speed on this axis
-        if(purePosLeft <= viewLeft) {
+        if(posLeft <= viewLeft) {
             posLeft = viewLeft;
             xVelocity = -xVelocity;
         }
 
-        // If the ball reachs the right of the screen, the ball does not get out of the screen and
+        // If the ball reaches the right of the screen, the ball does not get out of the screen and
         // has no speed on this axis
-        else if(purePosLeft >= (viewRight - ballWidth)) {
+        else if(posLeft >= (viewRight - ballWidth)) {
             posLeft = viewRight - ballWidth;
             xVelocity = -xVelocity;
         }
         else {
-            posLeft = purePosLeft;
-            xVelocity = xPureVelocity;
+
+            // Vx(t) = Ax*t + Vx0
+            // where t is time, Ax is the accelerations on X axis (pixels/s2) and Vx0 is the initial
+            // speed of the ball
+            xVelocity = xAcceleration*periodUpdatePosSec + xVelocity;
         }
     }
 
@@ -180,13 +173,6 @@ public class BallView extends View {
         // Getting left and top position for a picture at the center of the view component
         posLeft = (w - ballWidth)/2;
         posTop = (h - ballHeight)/2;
-
-        // Velocity of the ball = 0
-        xVelocity = 0;
-        yVelocity = 0;
-
-        // Setting the factor speed of the ball
-        setFactorSpeed(1);
     }
 
     // onDraw is called by the system each time the view component is displayed or updated
@@ -226,9 +212,6 @@ public class BallView extends View {
     public void setFactorSpeed(double factorSpeed) {
         if(factorSpeed != 0) {
             this.factorSpeed = factorSpeed;
-        }
-        else {
-            this.factorSpeed = 1;
         }
     }
 }

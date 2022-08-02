@@ -11,8 +11,8 @@ import android.hardware.SensorManager;
 public class Accelerometer implements SensorEventListener {
 
     // Current acceleration in X and Y in meters square
-    private float aX;
-    private float aY;
+    private float aX = 0;
+    private float aY = 0;
 
     // sensorsOnDevice represents the sensors on the device.
     // accelerometer represents the accelerometer on the device.
