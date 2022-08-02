@@ -6,7 +6,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.DialogInterface;
 import android.hardware.SensorManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
@@ -45,7 +44,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     // How many times the pixel accelerometer values should be checked per
     // PERIOD_REFRESH_BALL_POS_MS ms
-    public static final int FREQ_CHECK_PIX_ACCELEROMETER = 1;
+    public static final int FREQ_CHECK_ACCELEROMETER = 1;
 
     // Textviews that display the coordinates in mm
     private TextView tvXValue;
@@ -142,7 +141,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             // Giving the check accelerometer values period to the Accelerometer in us: once between
             // the ballView updates and the list of devices.
-            accelerometer = new Accelerometer(sensorsOnDevice, PERIOD_REFRESH_BALL_MS*1000/FREQ_CHECK_PIX_ACCELEROMETER);
+            accelerometer = new Accelerometer(sensorsOnDevice, PERIOD_REFRESH_BALL_MS*1000/FREQ_CHECK_ACCELEROMETER);
         }
 
         // In case of a failure of the accelerometer initialization.
