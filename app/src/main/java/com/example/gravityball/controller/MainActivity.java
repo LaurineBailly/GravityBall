@@ -8,7 +8,6 @@ import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -52,9 +51,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private TextView tvYValue;
 
     // RadioButtons thanks to which the user sets the ball speed
-    private RadioButton rbFast;
-    private RadioButton rbSlow;
-    private RadioButton rbMedium;
     private RadioGroup rbgSpeed;
 
     // onCreate is called when the activity is being open
@@ -65,6 +61,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         // Forbidding phone from sleeping
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+        // Radio buttons components
+        RadioButton rbFast;
+        RadioButton rbSlow;
+        RadioButton rbMedium;
 
         // Getting the graphic components
         ballView = findViewById(R.id.id_ballView);
@@ -128,7 +129,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 // A window pops up displaying the error and invites the user to close the application.
                 // When the user presses close, onDestroy() is triggered.
-                final EditText description = new EditText(this);
                 AlertDialog.Builder errorPopUp = new AlertDialog.Builder(this);
                 errorPopUp.setTitle("Error encountered");
                 errorPopUp.setMessage("The following error has been encountered: " + e);

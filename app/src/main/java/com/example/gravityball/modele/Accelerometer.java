@@ -1,7 +1,5 @@
 package com.example.gravityball.modele;
 
-import static android.content.Context.SENSOR_SERVICE;
-
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -16,11 +14,11 @@ public class Accelerometer implements SensorEventListener {
 
     // sensorsOnDevice represents the sensors on the device.
     // accelerometer represents the accelerometer on the device.
-    private SensorManager sensorsOnDevice;
-    private Sensor accelerometer;
+    private final SensorManager sensorsOnDevice;
+    private final Sensor accelerometer;
 
     // Period after which the accelerometer values are checked in us.
-    private int periodCheckValuesUs;
+    private final int periodCheckValuesUs;
 
     public Accelerometer(SensorManager sensorsOnDevice, int periodCheckValuesUs) throws IllegalArgumentException, UnsupportedOperationException {
         this.sensorsOnDevice = sensorsOnDevice;

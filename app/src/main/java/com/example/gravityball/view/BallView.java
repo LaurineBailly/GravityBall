@@ -7,7 +7,6 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.Nullable;
@@ -17,7 +16,7 @@ import com.example.gravityball.R;
 public class BallView extends View {
 
     // Pencil that will allow the picture to be drawn
-    private Paint picturePainter = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint picturePainter = new Paint(Paint.ANTI_ALIAS_FLAG);
 
     // Bitmap that will be drawn
     private Bitmap ballPicture;
