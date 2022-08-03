@@ -29,9 +29,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public static final int PERIOD_REFRESH_BALL_MS = 40;
 
     // Defining speed types
-    public static final float SPEED_SLOW = 0.5f;
-    public static final float SPEED_MEDIUM = 0.7f;
-    public static final float SPEED_FAST = 0.9f;
+    public static final float SPEED_SLOW = 0.01f;
+    public static final float SPEED_MEDIUM = 0.08f;
+    public static final float SPEED_FAST = 0.64f;
 
     // True if the ball bitmap is loaded
     private boolean ballPictureLoaded = false;

@@ -7,4 +7,8 @@
     <string name="description_speed_settings">Please set the speed you want the ball to browse at:</string>
     <string name="rb_fast">Fast</string>
     <string name="rb_medium">Medium</string>
+    <string name="braking_intensity_title">BRAKING INTENSITY</string>
+    <string name="braking_intensity_description">Please set the braking intensity you want to apply to the ball.</string>
+    <string name="rb_high">High</string>
+    <string name="rb_low">LOW</string>
 </resources>

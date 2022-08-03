@@ -93,10 +93,6 @@ public class BallView extends View {
         // where t is time and Ay is the accelerations on Y axis (pixels/s2)
         double yMoveAy = 0.5*yAcceleration*periodUpdatePosSec*periodUpdatePosSec;
 
-        // Factor speed set to the velocity
-        xVelocity = xVelocity*factorSpeed;
-        yVelocity = yVelocity*factorSpeed;
-
         // Sx = Sx(t-1) + xMoveAx + Ux(t-1)*t
         // where Sx is position, Ux is initial velocity, t is time.
         posLeft = posLeft + xMoveAx + xVelocity*periodUpdatePosSec;
