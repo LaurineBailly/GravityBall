@@ -39,7 +39,7 @@ public class BallView extends View {
     private double yVelocity = 0;
 
     // Factor to multiply the speed of the ball by
-    private double factorSpeed = 1;
+    private float factorSpeed = 1;
 
     // Period after which the ball position is updated in seconds
     private double periodUpdatePosSec = 0;
@@ -60,7 +60,7 @@ public class BallView extends View {
         // Independent Pixel unit, where one DIP is one pixel on an approximately 160 dpi screen
         // density of the screen (pixels per inch). DENSITY_DEFAULT = 160.
         // getting the number of pixels in 1 inch
-        double density = screenMetrics.DENSITY_DEFAULT*screenMetrics.density;
+        double density = 160*screenMetrics.density;
 
         if(density != 0) {
             // 25.4mm = 1 inch.
@@ -74,7 +74,7 @@ public class BallView extends View {
 
         // periodUpdatePosSec not set
         if(periodUpdatePosSec == 0) {
-            throw new IllegalStateException("The update period of the view has not been set.");
+            throw new Exception("The update period of the view has not been set.");
         }
 
         // Conversion of the acceleration data (meter/s2 --> pixels/s2)
@@ -171,8 +171,8 @@ public class BallView extends View {
         viewRight = getRight();
 
         // Getting left and top position for a picture at the center of the view component
-        posLeft = (w - ballWidth)/2;
-        posTop = (h - ballHeight)/2;
+        posLeft = (w - ballWidth)/2f;
+        posTop = (h - ballHeight)/2f;
     }
 
     // onDraw is called by the system each time the view component is displayed or updated
@@ -205,11 +205,11 @@ public class BallView extends View {
     public void setPeriodUpdatePosSec(double periodUpdatePosSec) throws Exception {
         this.periodUpdatePosSec = periodUpdatePosSec;
         if(periodUpdatePosSec <= 0) {
-            throw new IllegalArgumentException("The period to update the view can not be nul or negative");
+            throw new Exception("The period to update the view can not be nul or negative");
         }
     }
 
-    public void setFactorSpeed(double factorSpeed) {
+    public void setFactorSpeed(float factorSpeed) {
         if(factorSpeed != 0) {
             this.factorSpeed = factorSpeed;
         }

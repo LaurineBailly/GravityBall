@@ -17,6 +17,7 @@ import com.example.gravityball.R;
 import com.example.gravityball.modele.Accelerometer;
 import com.example.gravityball.view.BallView;
 
+import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -29,9 +30,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public static final int PERIOD_REFRESH_BALL_MS = 40;
 
     // Defining speed types
-    public static final double SPEED_SLOW = 0.5;
-    public static final double SPEED_MEDIUM = 0.7;
-    public static final double SPEED_FAST = 0.9;
+    public static final float SPEED_SLOW = 0.5f;
+    public static final float SPEED_MEDIUM = 0.7f;
+    public static final float SPEED_FAST = 0.9f;
 
     // True if the ball bitmap is loaded
     private boolean ballPictureLoaded = false;
@@ -91,19 +92,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         // Listening when the onSizeChanged method is called on ballView, it allows to be sure that
         // the bipmap file is loaded.
-        ballView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
-            @Override
-            public void onLayoutChange(View view, int i, int i1, int i2, int i3, int i4, int i5, int i6, int i7) {
+        ballView.addOnLayoutChangeListener((View view, int i, int i1, int i2, int i3, int i4, int i5, int i6, int i7) -> {
 
-                // The ball picture is loaded
-                ballPictureLoaded = true;
+            // The ball picture is loaded
+            ballPictureLoaded = true;
 
-                // Getting and setting to the ballView the ball speed
-                setBallSpeedSelectedByUser();
+            // Getting and setting to the ballView the ball speed
+            setBallSpeedSelectedByUser();
 
-                // Display the coordinates of the ballView
-                displayBallCoordinates();
-            }
+            // Display the coordinates of the ballView
+            displayBallCoordinates();
         });
 
         // sensorsOnDevice is the manager of the sensors on the device.
@@ -133,13 +131,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 final EditText description = new EditText(this);
                 AlertDialog.Builder errorPopUp = new AlertDialog.Builder(this);
                 errorPopUp.setTitle("Error encountered");
-                errorPopUp.setMessage("The following error has been encountered: " + e.toString());
-                errorPopUp.setPositiveButton("Close", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        finish();
-                    }
-                });
+                errorPopUp.setMessage("The following error has been encountered: " + e);
+                errorPopUp.setPositiveButton("Close", (DialogInterface dialog, int which) -> finish());
                 errorPopUp.show();
             }
         }
@@ -204,8 +197,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     // Setting the coordinates values of the ball to the textviews in mm
     public void displayBallCoordinates() {
-        tvXValue.setText(String.format("%.1f", ballView.getPosLeftMm()));
-        tvYValue.setText(String.format("%.1f", ballView.getPosTopMm()));
+        tvXValue.setText(String.format(Locale.getDefault(),"%.1f", ballView.getPosLeftMm()));
+        tvYValue.setText(String.format(Locale.getDefault(),"%.1f", ballView.getPosTopMm()));
     }
 
     // Called when a click is detected on one of the radio buttons
@@ -218,16 +211,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     // user
     public void setBallSpeedSelectedByUser() {
         int idRbChecked = rbgSpeed.getCheckedRadioButtonId();
-        switch(idRbChecked) {
-            case R.id.id_rb_slow:
-                ballView.setFactorSpeed(SPEED_SLOW);
-                break;
-            case R.id.id_rb_fast:
-                ballView.setFactorSpeed(SPEED_FAST);
-                break;
-            default:
-                ballView.setFactorSpeed(SPEED_MEDIUM);
-                break;
+        if(idRbChecked == R.id.id_rb_slow) {
+            ballView.setFactorSpeed(SPEED_SLOW);
+        }
+        else if(idRbChecked == R.id.id_rb_medium) {
+            ballView.setFactorSpeed(SPEED_MEDIUM);
+        }
+        else if(idRbChecked == R.id.id_rb_fast) {
+            ballView.setFactorSpeed(SPEED_FAST);
+        }
+        else {
+            ballView.setFactorSpeed(SPEED_MEDIUM);
         }
     }
 }
