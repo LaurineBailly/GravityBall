@@ -70,11 +70,11 @@ public class BallView extends View {
     }
 
     // Set new position values of the ball
-    public void setPosition(double aX, double aY) throws Exception {
+    public void setPosition(double aX, double aY) throws IllegalArgumentException {
 
         // periodUpdatePosSec not set
         if(periodUpdatePosSec == 0) {
-            throw new Exception("The update period of the view has not been set.");
+            throw new IllegalArgumentException("The update period of the view has not been set.");
         }
 
         // Conversion of the acceleration data (meter/s2 --> pixels/s2)
@@ -202,10 +202,10 @@ public class BallView extends View {
         return posLeft/pixelsInOneMm;
     }
 
-    public void setPeriodUpdatePosSec(double periodUpdatePosSec) throws Exception {
+    public void setPeriodUpdatePosSec(double periodUpdatePosSec) throws IllegalArgumentException {
         this.periodUpdatePosSec = periodUpdatePosSec;
         if(periodUpdatePosSec <= 0) {
-            throw new Exception("The period to update the view can not be nul or negative");
+            throw new IllegalArgumentException("The period to update the view can not be nul or negative");
         }
     }
 

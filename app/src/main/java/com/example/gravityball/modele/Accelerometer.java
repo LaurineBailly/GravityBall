@@ -22,7 +22,7 @@ public class Accelerometer implements SensorEventListener {
     // Period after which the accelerometer values are checked in us.
     private int periodCheckValuesUs;
 
-    public Accelerometer(SensorManager sensorsOnDevice, int periodCheckValuesUs) throws Exception {
+    public Accelerometer(SensorManager sensorsOnDevice, int periodCheckValuesUs) throws IllegalArgumentException, UnsupportedOperationException {
         this.sensorsOnDevice = sensorsOnDevice;
 
         // Set the accelerometer period in us
