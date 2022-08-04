@@ -80,8 +80,8 @@ public class BallView extends View {
         // Factor speed set to the acceleration
         // The X position axis and X acceleration axis on the device are opposite. We put the
         // acceleration axis in the same direction of the position and therefore velocity ones.
-        double xAcceleration = -aX*1000*pixelsInOneMm;
-        double yAcceleration = aY*1000*pixelsInOneMm;
+        double xAcceleration = -aX*1000*pixelsInOneMm*factorSpeed;
+        double yAcceleration = aY*1000*pixelsInOneMm*factorSpeed;
 
         // Acceleration components corresponding to the position delta due to acceleration only
 
@@ -95,11 +95,11 @@ public class BallView extends View {
 
         // Sx = Sx(t-1) + xMoveAx + Ux(t-1)*t
         // where Sx is position, Ux is initial velocity, t is time.
-        posLeft = posLeft + xMoveAx + xVelocity*factorSpeed*periodUpdatePosSec;
+        posLeft = posLeft + xMoveAx + xVelocity*periodUpdatePosSec;
 
         // Sy = Sy(t-1) + yMoveAy + Uy(t-1)*t
         // where Sy is position, Uy is initial velocity, t is time.
-        posTop = posTop + yMoveAy + yVelocity*factorSpeed*periodUpdatePosSec;
+        posTop = posTop + yMoveAy + yVelocity*periodUpdatePosSec;
 
         // Determining the Y position value
 
