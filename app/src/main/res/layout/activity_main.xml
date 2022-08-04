@@ -91,7 +91,7 @@
                 android:background="@drawable/border_title"
                 android:gravity="center"
                 android:padding="4dp"
-                android:text="@string/title_speed_settings"
+                android:text="@string/title_acceleration_settings"
                 android:textColor="@color/textOnDark"
                 android:textSize="24sp" />
 
@@ -101,12 +101,12 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/border_description"
                 android:padding="8dp"
-                android:text="@string/description_speed_settings"
+                android:text="@string/description_acceleration_settings"
                 android:textColor="@color/textOnLight"
                 android:textSize="16sp" />
 
             <RadioGroup
-                android:id="@+id/id_rbg_speed"
+                android:id="@+id/id_rbg_acceleration"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@drawable/border_value"
@@ -114,13 +114,13 @@
                 android:padding="16dp">
 
                 <RadioButton
-                    android:id="@+id/id_rb_slow"
+                    android:id="@+id/id_rb_low"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:buttonTint="@color/textOnLight"
                     android:minHeight="48dp"
-                    android:text="@string/rb_slow"
+                    android:text="@string/rb_low"
                     android:textColor="@color/textOnLight"
                     android:textSize="16sp" />
 
@@ -137,13 +137,13 @@
                     android:textSize="16sp" />
 
                 <RadioButton
-                    android:id="@+id/id_rb_fast"
+                    android:id="@+id/id_rb_high"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:buttonTint="@color/textOnLight"
                     android:minHeight="48dp"
-                    android:text="@string/rb_fast"
+                    android:text="@string/rb_high"
                     android:textColor="@color/textOnLight"
                     android:textSize="16sp" />
             </RadioGroup>

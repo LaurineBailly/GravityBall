@@ -37,8 +37,8 @@ public class BallView extends View {
     private double xVelocity = 0;
     private double yVelocity = 0;
 
-    // Factor to multiply the speed of the ball by
-    private float factorSpeed = 1f;
+    // Factor to multiply the acceleration of the ball by
+    private float factorAcceleration = 1f;
 
     // Period after which the ball position is updated in seconds
     private double periodUpdatePosSec = 0;
@@ -77,11 +77,11 @@ public class BallView extends View {
         }
 
         // Conversion of the acceleration data (meter/s2 --> pixels/s2)
-        // Factor speed set to the acceleration
+        // factor_acceleration set to the acceleration
         // The X position axis and X acceleration axis on the device are opposite. We put the
         // acceleration axis in the same direction of the position and therefore velocity ones.
-        double xAcceleration = -aX*1000*pixelsInOneMm*factorSpeed;
-        double yAcceleration = aY*1000*pixelsInOneMm*factorSpeed;
+        double xAcceleration = -aX*1000*pixelsInOneMm*factorAcceleration;
+        double yAcceleration = aY*1000*pixelsInOneMm*factorAcceleration;
 
         // Acceleration components corresponding to the position delta due to acceleration only
 
@@ -204,9 +204,9 @@ public class BallView extends View {
         }
     }
 
-    public void setFactorSpeed(float factorSpeed) {
-        if(factorSpeed != 0) {
-            this.factorSpeed = factorSpeed;
+    public void setFactorAcceleration(float factorAcceleration) {
+        if(factorAcceleration != 0) {
+            this.factorAcceleration = factorAcceleration;
         }
     }
 }

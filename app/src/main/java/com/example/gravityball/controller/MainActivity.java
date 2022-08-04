@@ -24,10 +24,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     // Period after which we wish the ball position to be updated
     public static final int PERIOD_REFRESH_BALL_MS = 40;
 
-    // Defining speed types
-    public static final float SPEED_SLOW = 0.1f;
-    public static final float SPEED_MEDIUM = 0.2f;
-    public static final float SPEED_FAST = 0.4f;
+    // Defining acceleration types
+    public static final float ACCELERATION_LOW = 0.001f;
+    public static final float ACCELERATION_MEDIUM = 0.01f;
+    public static final float ACCELERATION_HIGH = 0.02f;
 
     // True if the ball bitmap is loaded
     private boolean ballPictureLoaded = false;
@@ -46,8 +46,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private TextView tvXValue;
     private TextView tvYValue;
 
-    // RadioButtons thanks to which the user sets the ball speed
-    private RadioGroup rbgSpeed;
+    // RadioButtons thanks to which the user sets the ball acceleration
+    private RadioGroup rbgAcceleration;
 
     // A handler is like a message queue that will process a runnable
     // Differences between a handler and a timer :
@@ -67,22 +67,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         // Radio buttons components
-        RadioButton rbFast;
-        RadioButton rbSlow;
+        RadioButton rbHigh;
+        RadioButton rbLow;
         RadioButton rbMedium;
 
         // Getting the graphic components
         ballView = findViewById(R.id.id_ballView);
         tvXValue = findViewById(R.id.id_tvXValue);
         tvYValue = findViewById(R.id.id_tvYValue);
-        rbFast = findViewById(R.id.id_rb_fast);
-        rbSlow = findViewById(R.id.id_rb_slow);
+        rbHigh = findViewById(R.id.id_rb_high);
+        rbLow = findViewById(R.id.id_rb_low);
         rbMedium = findViewById(R.id.id_rb_medium);
-        rbgSpeed = findViewById(R.id.id_rbg_speed);
+        rbgAcceleration = findViewById(R.id.id_rbg_acceleration);
 
         // Register a callback to be invoked when one of the radio buttons is clicked.
-        rbFast.setOnClickListener(this);
-        rbSlow.setOnClickListener(this);
+        rbHigh.setOnClickListener(this);
+        rbLow.setOnClickListener(this);
         rbMedium.setOnClickListener(this);
 
         // Indicating to the ballView the period with which it is updated in seconds
@@ -102,8 +102,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             // The ball picture is loaded
             ballPictureLoaded = true;
 
-            // Getting the ball speed and setting it to the ballView
-            setBallSpeedSelectedByUser();
+            // Getting the ball acceleration and setting it to the ballView
+            setBallAccelerationSelectedByUser();
 
             // Display the coordinates of the ballView
             displayBallCoordinates();
@@ -218,24 +218,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     // Called when a click is detected on one of the radio buttons
     @Override
     public void onClick(View v) {
-        setBallSpeedSelectedByUser();
+        setBallAccelerationSelectedByUser();
     }
 
-    // Method that sets the speed factor to the ballView in function of the speed selected by the
-    // user
-    public void setBallSpeedSelectedByUser() {
-        int idRbChecked = rbgSpeed.getCheckedRadioButtonId();
-        if(idRbChecked == R.id.id_rb_slow) {
-            ballView.setFactorSpeed(SPEED_SLOW);
+    // Method that sets the acceleration factor to the ballView in function of the acceleration
+    // selected by the user
+    public void setBallAccelerationSelectedByUser() {
+        int idRbChecked = rbgAcceleration.getCheckedRadioButtonId();
+        if(idRbChecked == R.id.id_rb_low) {
+            ballView.setFactorAcceleration(ACCELERATION_LOW);
         }
         else if(idRbChecked == R.id.id_rb_medium) {
-            ballView.setFactorSpeed(SPEED_MEDIUM);
+            ballView.setFactorAcceleration(ACCELERATION_MEDIUM);
         }
-        else if(idRbChecked == R.id.id_rb_fast) {
-            ballView.setFactorSpeed(SPEED_FAST);
+        else if(idRbChecked == R.id.id_rb_high) {
+            ballView.setFactorAcceleration(ACCELERATION_HIGH);
         }
         else {
-            ballView.setFactorSpeed(SPEED_MEDIUM);
+            ballView.setFactorAcceleration(ACCELERATION_MEDIUM);
         }
     }
 }

@@ -2,13 +2,9 @@
     <string name="app_name">GrativyBall</string>
     <string name="tv_title_x">X (mm)</string>
     <string name="tv_title_y">Y (mm)</string>
-    <string name="rb_slow">Slow</string>
-    <string name="title_speed_settings">SPEED</string>
-    <string name="description_speed_settings">Please set the speed you want the ball to browse at:</string>
-    <string name="rb_fast">Fast</string>
-    <string name="rb_medium">Medium</string>
-    <string name="braking_intensity_title">BRAKING INTENSITY</string>
-    <string name="braking_intensity_description">Please set the braking intensity you want to apply to the ball.</string>
+    <string name="rb_low">Low</string>
+    <string name="title_acceleration_settings">GRAVITY</string>
+    <string name="description_acceleration_settings">Please set the gravity you want to set to the ball:</string>
     <string name="rb_high">High</string>
-    <string name="rb_low">LOW</string>
+    <string name="rb_medium">Medium</string>
 </resources>
