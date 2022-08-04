@@ -38,7 +38,7 @@ public class BallView extends View {
     private double yVelocity = 0;
 
     // Factor to multiply the speed of the ball by
-    private float factorSpeed = 1;
+    private float factorSpeed = 1f;
 
     // Period after which the ball position is updated in seconds
     private double periodUpdatePosSec = 0;
@@ -80,8 +80,8 @@ public class BallView extends View {
         // Factor speed set to the acceleration
         // The X position axis and X acceleration axis on the device are opposite. We put the
         // acceleration axis in the same direction of the position and therefore velocity ones.
-        double xAcceleration = -aX*1000*pixelsInOneMm*factorSpeed;
-        double yAcceleration = aY*1000*pixelsInOneMm*factorSpeed;
+        double xAcceleration = -aX*1000*pixelsInOneMm;
+        double yAcceleration = aY*1000*pixelsInOneMm;
 
         // Acceleration components corresponding to the position delta due to acceleration only
 
@@ -95,11 +95,11 @@ public class BallView extends View {
 
         // Sx = Sx(t-1) + xMoveAx + Ux(t-1)*t
         // where Sx is position, Ux is initial velocity, t is time.
-        posLeft = posLeft + xMoveAx + xVelocity*periodUpdatePosSec;
+        posLeft = posLeft + xMoveAx + xVelocity*factorSpeed*periodUpdatePosSec;
 
         // Sy = Sy(t-1) + yMoveAy + Uy(t-1)*t
         // where Sy is position, Uy is initial velocity, t is time.
-        posTop = posTop + yMoveAy + yVelocity*periodUpdatePosSec;
+        posTop = posTop + yMoveAy + yVelocity*factorSpeed*periodUpdatePosSec;
 
         // Determining the Y position value
 

@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.DialogInterface;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.RadioButton;
@@ -17,21 +18,16 @@ import com.example.gravityball.modele.Accelerometer;
 import com.example.gravityball.view.BallView;
 
 import java.util.Locale;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    // A timer thanks to which the ball position will be updated
-    Timer timerRefreshBallView;
-
-    // Period after which the ball position is updated
+    // Period after which we wish the ball position to be updated
     public static final int PERIOD_REFRESH_BALL_MS = 40;
 
     // Defining speed types
-    public static final float SPEED_SLOW = 0.01f;
-    public static final float SPEED_MEDIUM = 0.08f;
-    public static final float SPEED_FAST = 0.64f;
+    public static final float SPEED_SLOW = 0.1f;
+    public static final float SPEED_MEDIUM = 0.2f;
+    public static final float SPEED_FAST = 0.4f;
 
     // True if the ball bitmap is loaded
     private boolean ballPictureLoaded = false;
@@ -52,6 +48,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     // RadioButtons thanks to which the user sets the ball speed
     private RadioGroup rbgSpeed;
+
+    // A handler is like a message queue that will process a runnable
+    // Differences between a handler and a timer :
+    // https://medium.com/@f2016826/timers-vs-handlers-aeae5d3cb5a
+    private final Handler handler = new Handler();
+
+    // The runnable assigned to the handler : updates the ball View
+    private Runnable taskUpdateBallView;
 
     // onCreate is called when the activity is being open
     @Override
@@ -98,7 +102,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             // The ball picture is loaded
             ballPictureLoaded = true;
 
-            // Getting and setting to the ballView the ball speed
+            // Getting the ball speed and setting it to the ballView
             setBallSpeedSelectedByUser();
 
             // Display the coordinates of the ballView
@@ -136,20 +140,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 errorPopUp.show();
             }
         }
-    }
 
-    // The activity is visible on the screen
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        // Instantiating the timer
-        timerRefreshBallView = new Timer();
-
-        // timerRefreshBallView will tick every PERIOD_REFRESH_BALL_MS ms and starts immediately.
-        timerRefreshBallView.scheduleAtFixedRate(new TimerTask() {
+        // Defining the task for updating the ballView
+        taskUpdateBallView = new Runnable() {
             @Override
             public void run() {
+
+                // Getting the current time in ms
+                long currentTimeMillis = System.currentTimeMillis();
+
+                // If the ball picture is loaded
                 if(ballPictureLoaded) {
 
                     // Setting the new position of the ball according to the acceleration noticed
@@ -169,8 +169,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     // Setting the coordinates values to the textviews in mm
                     displayBallCoordinates();
                 }
+
+                // Removing the callback for this task of the handler
+                handler.removeCallbacks(taskUpdateBallView);
+
+                // Time that took the previous code in this runnable
+                long durationTaskUpdateBallView = currentTimeMillis - System.currentTimeMillis();
+
+                // If we are already running out of time, this same task is started immediately
+                if(durationTaskUpdateBallView <= PERIOD_REFRESH_BALL_MS) {
+                    handler.post(taskUpdateBallView);
+                }
+
+                // Otherwise this same task is delayed
+                else {
+                    handler.postDelayed(taskUpdateBallView, PERIOD_REFRESH_BALL_MS - durationTaskUpdateBallView);
+                }
             }
-        }, 0, PERIOD_REFRESH_BALL_MS);
+        };
     }
 
     // The activity is running
@@ -178,6 +194,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onResume() {
         super.onResume();
         accelerometer.startListener();
+
+        // taskUpdateBallView starts
+        handler.post(taskUpdateBallView);
     }
 
     // Something interrupted the activity
@@ -185,14 +204,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onPause() {
         super.onPause();
         accelerometer.cancelListener();
-    }
 
-    // The activity is not visible on the screen
-    @Override
-    protected void onStop() {
-        super.onStop();
-        timerRefreshBallView.cancel();
-        timerRefreshBallView.purge();
+        // Removing the callback for taskUpdateBallView
+        handler.removeCallbacks(taskUpdateBallView);
     }
 
     // Setting the coordinates values of the ball to the textviews in mm
